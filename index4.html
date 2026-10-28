@@ -1,0 +1,504 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Melila Grama Panchayat WebGIS</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Page Styling -->
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f3f7f4;
+            color: #26332b;
+            line-height: 1.7;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h1, h2, h3 {
+            color: #2d6a4f;
+        }
+
+        h1 {
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            border-bottom: 2px solid #d8e8dc;
+            padding-bottom: 8px;
+        }
+
+        .government-page {
+            text-align: center;
+            padding: 35px 25px;
+            margin-bottom: 35px;
+            border-bottom: 3px solid #2d6a4f;
+        }
+
+        .government-page h1 {
+            font-size: 28px;
+        }
+
+        .government-logo {
+            display: block;
+            width: 100%;
+            max-width: 220px;
+            max-height: 250px;
+            object-fit: contain;
+            margin: 25px auto;
+        }
+
+        .government-description {
+            text-align: justify;
+            line-height: 1.9;
+            font-size: 15px;
+            color: #333;
+            margin-top: 25px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #527761;
+            font-size: 16px;
+        }
+
+        header {
+            background: #2d6a4f;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            color: white;
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .panchayat-image {
+            display: block;
+            width: 100%;
+            max-width: 650px;
+            max-height: 400px;
+            object-fit: contain;
+            margin: 25px auto;
+            border-radius: 10px;
+        }
+
+        .description {
+            text-align: justify;
+            font-size: 16px;
+        }
+
+        .location-map {
+            display: block;
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: #f4f8f5;
+            border-left: 5px solid #2d6a4f;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .info-card h3 {
+            margin-top: 0;
+        }
+
+        .info-card ul {
+            padding-left: 22px;
+        }
+
+        .resource-map {
+            text-align: center;
+            background: #edf5ef;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .resource-map-button {
+            display: inline-block;
+            background: #2d6a4f;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+
+        .resource-map-button:hover {
+            background: #1b4332;
+        }
+
+        .project-details {
+            text-align: center;
+            margin-top: 25px;
+            padding: 20px;
+            background: #f4f8f5;
+            border-radius: 8px;
+        }
+
+        .project-details a {
+            color: #2d6a4f;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 18px;
+            background: #2d6a4f;
+            color: white;
+            border-radius: 8px;
+        }
+
+        .divider {
+            border: none;
+            border-top: 2px solid #2d6a4f;
+            width: 80%;
+            margin: 30px auto 20px;
+        }
+
+        .contact {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            line-height: 1.7;
+            padding: 20px;
+        }
+
+        .contact h3 {
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .contact a {
+            color: #2d6a4f;
+            text-decoration: none;
+        }
+
+        .contact a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 700px) {
+            .page {
+                margin: 10px;
+                padding: 18px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 23px;
+            }
+
+            .government-page h1 {
+                font-size: 23px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .page {
+                box-shadow: none;
+                margin: 0;
+                max-width: 100%;
+            }
+
+            .resource-map-button {
+                color: #2d6a4f;
+                background: white;
+                border: 1px solid #2d6a4f;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PAGE 1: GOVERNMENT OF KERALA -->
+
+    <section class="page government-page">
+
+        <h1>GOVERNMENT OF KERALA</h1>
+
+        <img src="govt of kerala logo.jpg"
+             alt="Government of Kerala emblem"
+             class="government-logo">
+
+        <p class="government-description">
+            The Government of Kerala was formed on 1 November 1956,
+            following the reorganisation of states on a linguistic basis.
+            Kerala has a three-tier Panchayati Raj system to strengthen
+            local self-government and promote people's participation
+            in development. The system consists of Grama Panchayats
+            at the village level, Block Panchayats at the intermediate
+            level, and District Panchayats at the district level.
+            Grama Panchayats administer local areas and address the
+            basic needs and development requirements of local
+            communities. Panchayats play an important role in
+            decentralised governance and rural development in Kerala.
+        </p>
+
+    </section>
+
+
+    <!-- PAGE 2: MELILA GRAMA PANCHAYAT WEBGIS -->
+
+    <main class="page">
+
+        <p class="subtitle">
+            MSc Geography — WebGIS Project
+        </p>
+
+        <header>
+            <h1>MELILA GRAMA PANCHAYAT</h1>
+        </header>
+
+        <!-- Panchayat Office Image -->
+
+        <img src="Grama Panchayat Office Image.webp"
+             alt="Melila Grama Panchayat office"
+             class="panchayat-image">
+
+        <p class="description">
+            Melila Grama Panchayat is located in Kollam district,
+            Kerala. This WebGIS project presents geographical and
+            administrative information about the Panchayat,
+            including its location, boundaries, wards, roads,
+            resource distribution and other important features.
+            The project helps users explore the geographical
+            characteristics of the Panchayat.
+        </p>
+
+
+        <!-- LOCATION MAP -->
+
+        <section>
+
+            <h2>Location Map</h2>
+
+            <p>
+                The following map shows the location of Melila
+                Grama Panchayat and its geographical setting.
+            </p>
+
+            <img src="Location map of melila panchayat.png"
+                 alt="Location map of Melila Grama Panchayat"
+                 class="location-map">
+
+        </section>
+
+
+        <!-- GEOGRAPHICAL INFORMATION -->
+
+        <section>
+
+            <h2>Geographical Information</h2>
+
+            <p>
+                Explore the key geographical and administrative
+                details of Melila Grama Panchayat below.
+            </p>
+
+            <div class="info-grid">
+
+                <!-- Administrative Details -->
+
+                <div class="info-card">
+
+                    <h3>Administrative Details</h3>
+
+                    <ul>
+                        <li><strong>District:</strong> Kollam</li>
+                        <li><strong>Taluk:</strong> Kottarakkara</li>
+                        <li><strong>Block:</strong> Vettikkavala</li>
+                        <li><strong>State:</strong> Kerala</li>
+                    </ul>
+
+                </div>
+
+
+                <!-- Geographic Setting -->
+
+                <div class="info-card">
+
+                    <h3>Geographic Setting</h3>
+
+                    <ul>
+                        <li>
+                            <strong>Physiography:</strong>
+                            Midland region with undulating terrain,
+                            low hills and valleys.
+                        </li>
+
+                        <li>
+                            <strong>Drainage Basin:</strong>
+                            An area of land from which rainfall
+                            and surface runoff flow towards a
+                            common outlet through streams and rivers.
+                        </li>
+
+                        <li>
+                            <strong>Surrounding Areas:</strong>
+                            Vettikkavala, Thalavoor, Mylom,
+                            Chakkuvarakkal, Ummannoor and Pattazhi.
+                        </li>
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- RESOURCE MAP -->
+
+        <section class="resource-map">
+
+            <h2>Resource Map of Melila Grama Panchayat</h2>
+
+            <p>
+                Explore the resource map of Melila Grama Panchayat
+                to view geographical features and other spatial
+                information about the study area.
+            </p>
+
+            <a href="https://manikuttan970.github.io/melila910/"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="resource-map-button">
+
+                View Resource Map
+
+            </a>
+
+        </section>
+
+
+        <!-- PROJECT INFORMATION -->
+
+        <section class="project-details">
+
+            <h2>Project Information</h2>
+
+            <p>
+                <strong>Project:</strong>
+                Melila Grama Panchayat WebGIS
+            </p>
+
+            <p>
+                <strong>Programme:</strong>
+                MSc Geography
+            </p>
+
+            <p>
+                <strong>Last Updated:</strong>
+                28 October 2026
+            </p>
+
+            <p>
+                <a href="https://lsgkerala.gov.in"
+                   target="_blank"
+                   rel="noopener noreferrer">
+
+                    Visit Local Self Government Department, Kerala
+
+                </a>
+            </p>
+
+        </section>
+
+
+        <!-- FOOTER -->
+
+        <footer>
+            MSc Geography — WebGIS Project
+            <br>
+            Melila Grama Panchayat, Kollam, Kerala
+        </footer>
+
+    </main>
+
+
+    <!-- CONTACT DETAILS -->
+
+    <hr class="divider">
+
+    <section class="contact">
+
+        <h3>CONTACT</h3>
+
+        <p>
+            <strong>MALAVIKA M.S</strong>
+        </p>
+
+        <p>
+            Email:
+            <a href="mailto:msmalavika866@gmail.com">
+                msmalavika866@gmail.com
+            </a>
+        </p>
+
+    </section>
+
+
+    <!-- Leaflet JavaScript -->
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+
+    <!-- External JavaScript -->
+
+    <script src="script.js"></script>
+
+</body>
+</html>
+```
